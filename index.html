@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atitudes — Protótipo de Avaliação Atitudinal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#2F9E41; --verde-esc:#17502A; --verde-claro:#EAF6EC; --verde-borda:#C9DCCD;
+  --branco:#FFFFFF; --tinta:#1C2B20; --suave:#55665A; --fundo:#F4FAF5;
+  --ambar:#9A5B00; --ambar-bg:#FDF1DC; --neutro:#5F6B63; --neutro-bg:#EEF1EF;
+  --alerta3:#B3261E; --alerta3-bg:#FBE9E7; --azul:#1D4ED8;
+  --r-s:8px; --r-m:14px; --r-l:22px;
+  font-family:"Atkinson Hyperlegible", "Segoe UI", Roboto, Arial, sans-serif;
+  color:var(--tinta);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);font-size:16px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--verde);outline-offset:2px}
+a{color:var(--verde-esc)}
+h1,h2,h3{margin:0;line-height:1.2}
+.muted{color:var(--suave)}
+.small{font-size:13px}
+.row{display:flex;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.stack>*+*{margin-top:12px}
+.btn{border:0;border-radius:999px;padding:12px 20px;background:var(--verde);color:#fff;font-weight:700}
+.btn:hover{background:var(--verde-esc)}
+.btn.sec{background:var(--branco);color:var(--verde-esc);box-shadow:inset 0 0 0 1.5px var(--verde)}
+.btn.sec:hover{background:var(--verde-claro)}
+.btn.full{width:100%}
+.btn.sm{padding:7px 14px;font-size:14px}
+.chip{border:1.5px solid var(--verde-borda);background:var(--branco);border-radius:999px;padding:6px 12px;font-size:14px}
+.chip.on{background:var(--verde-esc);border-color:var(--verde-esc);color:#fff}
+.card{background:var(--branco);border:1px solid var(--verde-borda);border-radius:var(--r-m);padding:16px}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;border-radius:999px;padding:2px 10px}
+.t-d{background:var(--verde-claro);color:var(--verde-esc)}
+.t-n{background:var(--neutro-bg);color:var(--neutro)}
+.t-a{background:var(--ambar-bg);color:var(--ambar)}
+.t-rev{background:#E8EEFC;color:var(--azul)}
+.t-ct{background:var(--ambar-bg);color:var(--ambar)}
+.sym{font-size:11px}
+.note{display:flex;gap:10px;background:var(--verde-claro);border-radius:var(--r-s);padding:10px 12px;font-size:13.5px;color:var(--verde-esc)}
+.note b{white-space:nowrap}
+.err{color:var(--alerta3);font-size:13px;margin-top:6px}
+textarea{width:100%;border:1.5px solid var(--verde-borda);border-radius:var(--r-s);padding:10px;min-height:96px;resize:vertical;background:#fff}
+input[type=text],input[type=number],select{border:1.5px solid var(--verde-borda);border-radius:var(--r-s);padding:9px 10px;background:#fff;width:100%}
+label.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
+label.check input{width:20px;height:20px;accent-color:var(--verde);margin-top:2px}
+
+/* ---------- Launcher ---------- */
+.launch{max-width:1040px;margin:0 auto;padding:48px 24px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;border-radius:12px;background:var(--verde);display:grid;grid-template-columns:repeat(2,12px);gap:4px;place-content:center}
+.logo i{width:12px;height:12px;border-radius:3px;background:#fff;display:block}
+.logo i:first-child{border-radius:50%;background:#fff}
+.launch h1{font-size:40px;margin:28px 0 10px;max-width:16ch;color:var(--verde-esc)}
+.launch .lead{font-size:18px;max-width:58ch;color:var(--suave)}
+.perfis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:36px}
+.perfil{text-align:left;border:1.5px solid var(--verde-borda);background:#fff;border-radius:var(--r-l);padding:22px;display:flex;flex-direction:column;gap:10px;min-height:190px}
+.perfil:hover{border-color:var(--verde);background:var(--verde-claro)}
+.perfil h2{font-size:21px}
+.perfil .dev{align-self:flex-start;font-size:12.5px;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--verde);color:#fff}
+.perfil .dev.d{background:var(--verde-esc)}
+.perfil p{margin:0;color:var(--suave);font-size:14.5px}
+.launch footer{margin-top:40px;font-size:13.5px;color:var(--suave)}
+
+/* ---------- Mobile shell ---------- */
+.stage{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 40px;gap:14px}
+.stage-top{width:390px;max-width:100%;display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.stage-top a{font-weight:700;text-decoration:none}
+.phone{width:390px;height:800px;background:var(--branco);border-radius:40px;border:10px solid var(--tinta);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.m-head{background:var(--verde);color:#fff;padding:22px 18px 16px}
+.m-head .sub{opacity:.9;font-size:14px}
+.m-head h1{font-size:22px;margin-top:2px}
+.m-head .back{color:#fff;text-decoration:none;font-size:14px;font-weight:700;display:inline-block;margin-bottom:6px}
+.m-body{flex:1;overflow-y:auto;padding:16px 16px 96px}
+.tabbar{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--verde-borda);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 4px 14px}
+.tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;text-decoration:none;color:var(--suave);padding:4px 0}
+.tabbar a .ico{width:26px;height:26px;border-radius:8px;display:grid;place-items:center}
+.tabbar a.on{color:var(--verde-esc);font-weight:700}
+.tabbar a.on .ico{background:var(--verde-claro)}
+.tabbar svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:600px){
+  .stage{padding:0}
+  .stage-top{display:none}
+  .phone{width:100%;height:100vh;height:100dvh;border:0;border-radius:0}
+}
+
+/* Registro rápido */
+.taps{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--verde-esc)}
+.taps span{width:22px;height:8px;border-radius:4px;background:var(--verde-borda)}
+.taps span.on{background:var(--verde)}
+.grid-alunos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.al{border:1.5px solid var(--verde-borda);background:#fff;border-radius:var(--r-m);padding:10px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;position:relative}
+.al .av{width:42px;height:42px;border-radius:50%;background:var(--verde-claro);color:var(--verde-esc);display:grid;place-items:center;font-weight:700;font-size:15px}
+.al.sel{border-color:var(--verde-esc);background:var(--verde-claro)}
+.al.sel .av{background:var(--verde-esc);color:#fff}
+.al .pend{position:absolute;top:6px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--ambar);box-shadow:0 0 0 2px #fff}
+.sheet-bg{position:absolute;inset:0;background:rgba(23,80,42,.28);display:flex;align-items:flex-end;z-index:5}
+.sheet{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:14px 18px 26px;animation:up .2s ease-out}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--verde-borda);margin:0 auto 12px}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+.dimbtns{display:grid;gap:8px;margin-top:12px}
+.dimbtn{border:1.5px solid var(--verde-borda);background:#fff;border-radius:var(--r-m);padding:11px 14px;text-align:left;font-weight:700;display:flex;flex-direction:column;gap:1px}
+.dimbtn:hover{border-color:var(--verde)}
+.tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.tipo{border:0;border-radius:var(--r-m);padding:18px 6px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:14.5px}
+.tipo .s{font-size:22px;line-height:1}
+.tipo.d{background:var(--verde-claro);color:var(--verde-esc)}
+.tipo.n{background:var(--neutro-bg);color:var(--neutro)}
+.tipo.a{background:var(--ambar-bg);color:var(--ambar)}
+.toast{position:absolute;left:12px;right:12px;bottom:84px;background:var(--tinta);color:#fff;border-radius:var(--r-m);padding:12px 14px;display:flex;gap:10px;align-items:center;z-index:6;font-size:14px}
+.toast.desk{position:fixed;left:auto;right:24px;bottom:24px;max-width:420px}
+.toast button{background:transparent;border:0;color:#9FE3AB;font-weight:700;padding:4px 6px}
+
+/* Timeline */
+.tl{list-style:none;margin:0;padding:0}
+.tl li{border-left:2px solid var(--verde-borda);padding:0 0 16px 16px;position:relative}
+.tl li::before{content:"";position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--verde)}
+.tl .meta{font-size:12.5px;color:var(--suave)}
+.list-btn{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:#fff;border-bottom:1px solid var(--verde-borda);padding:13px 2px;text-align:left}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px}
+.seg button{border:1.5px solid var(--verde-borda);background:#fff;border-radius:10px;padding:9px 2px;font-size:12.5px}
+.seg button.on{background:var(--verde-esc);border-color:var(--verde-esc);color:#fff;font-weight:700}
+.bar{height:10px;border-radius:5px;background:var(--verde-claro);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--verde)}
+.msg{border-radius:var(--r-m);padding:10px 12px;font-size:14.5px;max-width:88%}
+.msg.me{background:var(--verde-claro);margin-left:auto}
+.msg.them{background:var(--neutro-bg)}
+.msg .who{font-size:12px;font-weight:700;color:var(--suave);margin-bottom:2px}
+.steps{display:flex;gap:6px;font-size:12px}
+.steps span{flex:1;text-align:center;padding:6px 2px;border-radius:8px;background:var(--neutro-bg);color:var(--suave)}
+.steps span.done{background:var(--verde);color:#fff;font-weight:700}
+.switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--verde-borda);font-size:14.5px}
+.switch input{width:44px;height:24px;accent-color:var(--verde)}
+
+/* ---------- Desktop shell ---------- */
+.desk{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.side{background:var(--verde-esc);color:#fff;padding:22px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.side .brand{color:#fff;margin:0 8px 22px}
+.side .brand .logo{background:var(--verde)}
+.side a{color:#E3F3E6;text-decoration:none;padding:10px 12px;border-radius:10px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.side a:hover{background:rgba(255,255,255,.08)}
+.side a.on{background:var(--branco);color:var(--verde-esc);font-weight:700}
+.side .count{background:var(--alerta3);color:#fff;border-radius:999px;font-size:12px;padding:0 8px;font-weight:700}
+.side .foot{margin-top:auto;font-size:13px;opacity:.85;padding:0 8px}
+.side .foot a{padding:6px 0;color:#fff;font-weight:700}
+.main{padding:28px 32px 48px;max-width:1280px}
+.main h1{font-size:28px;color:var(--verde-esc)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0 20px}
+.toolbar select{width:auto}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{background:#fff;border:1px solid var(--verde-borda);border-radius:var(--r-m);padding:16px 18px;text-decoration:none;color:inherit}
+.kpi .v{font-size:34px;font-weight:700;color:var(--verde-esc);line-height:1.1}
+.kpi.warn .v{color:var(--alerta3)}
+.g2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.alertas{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.ac{background:#fff;border:1px solid var(--verde-borda);border-radius:var(--r-m);padding:16px;border-top:6px solid var(--ambar-bg)}
+.ac.n2{border-top-color:#E9A23B}
+.ac.n3{border-top-color:var(--alerta3)}
+.nivel{font-size:12.5px;font-weight:700;border-radius:999px;padding:3px 10px;display:inline-flex;gap:6px;align-items:center}
+.nivel.n1{background:var(--ambar-bg);color:var(--ambar)}
+.nivel.n2{background:#FBE3BF;color:#7A4300}
+.nivel.n3{background:var(--alerta3-bg);color:var(--alerta3)}
+.inds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.ind{border-radius:10px;padding:10px;background:var(--neutro-bg);font-size:12.5px}
+.ind .k{font-weight:700;color:var(--suave)}
+.ind .v{font-size:20px;font-weight:700;display:flex;align-items:center;gap:4px}
+.ind.bad{background:var(--ambar-bg)} .ind.bad .v{color:var(--ambar)}
+.ind.ok{background:var(--verde-claro)} .ind.ok .v{color:var(--verde-esc)}
+table.t{width:100%;border-collapse:collapse;font-size:14.5px}
+table.t th{text-align:left;font-size:13px;color:var(--suave);font-weight:700;padding:8px 10px;border-bottom:1.5px solid var(--verde-borda)}
+table.t td{padding:10px;border-bottom:1px solid var(--verde-borda)}
+.heat{display:grid;gap:4px;font-size:13px}
+.heat .c{border-radius:6px;padding:10px 4px;text-align:center;font-weight:700}
+.heat .h{font-weight:700;color:var(--suave);font-size:12.5px;padding:4px;display:flex;align-items:flex-end}
+.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.col{background:var(--verde-claro);border-radius:var(--r-m);padding:12px}
+.col h3{font-size:15px;margin:2px 4px 10px;color:var(--verde-esc)}
+.kc{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid var(--verde-borda);font-size:14px}
+.modal-bg{position:fixed;inset:0;background:rgba(23,80,42,.35);display:grid;place-items:center;z-index:20;padding:20px}
+.modal{background:#fff;border-radius:var(--r-l);padding:24px;width:520px;max-width:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--suave)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.stackbar{display:flex;height:22px;border-radius:6px;overflow:hidden}
+.stackbar i{display:block}
+@media (max-width:960px){
+  .desk{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:10px}
+  .side .brand,.side .foot{display:none}
+  .side a{white-space:nowrap}
+  .kpis,.g2,.g3,.kanban{grid-template-columns:1fr 1fr}
+  .main{padding:20px 16px}
+}
+@media (max-width:600px){.kpis,.g2,.g3,.kanban{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ================= Dados fictícios ================= */
+const DIMS=[
+  {id:'resp',n:'Responsabilidade',c:'Responsab.',d:'Prazos, materiais, assiduidade'},
+  {id:'colab',n:'Colaboração',c:'Colaboração',d:'Grupo, escuta, entreajuda'},
+  {id:'auto',n:'Autonomia',c:'Autonomia',d:'Iniciativa, persistência'},
+  {id:'part',n:'Participação',c:'Participação',d:'Discussões, interesse'},
+  {id:'conv',n:'Respeito e convivência',c:'Convivência',d:'Normas, trato com todos'}];
+const TIPOS={d:{n:'Destaque',s:'▲'},n:{n:'Neutro',s:'●'},a:{n:'A desenvolver',s:'◆'}};
+const NOMES=['Ana Clara Souza','Bruno Lima','Caio Ferreira','Davi Rocha','Elisa Martins','Felipe Costa','Giovana Reis','Heitor Almeida','Isadora Nunes','João Pedro Dias','Kauã Ribeiro','Larissa Prado','Miguel Torres','Natália Gomes','Otávio Mendes','Pietra Castro'];
+const ALUNOS=NOMES.map((n,i)=>({id:'a'+i,nome:n,curto:n.split(' ').slice(0,n.startsWith('Ana')||n.startsWith('João')?2:1).join(' '),ini:n.split(' ').map(p=>p[0]).slice(0,2).join(''),pend:[2,10,13].includes(i)}));
+const HEITOR='a7';
+const S={
+  reg:{multi:false,sel:[],dim:null,taps:0,open:false,last:null,comment:false},
+  registros:[
+    {id:1,al:HEITOR,dim:'auto',t:'a',dt:'24/10',prof:'Prof.ª Marta (Matemática)',txt:'Deixou a lista incompleta e não pediu ajuda.',st:'liberado'},
+    {id:2,al:HEITOR,dim:'colab',t:'d',dt:'23/10',prof:'Prof. Rafael (Ciências)',txt:'Explicou o experimento ao colega com paciência.',st:'liberado'},
+    {id:3,al:HEITOR,dim:'auto',t:'a',dt:'21/10',prof:'Prof.ª Marta (Matemática)',txt:'',st:'contestado'},
+    {id:4,al:HEITOR,dim:'resp',t:'a',dt:'17/10',prof:'Prof.ª Júlia (Português)',txt:'Terceira entrega sem o material.',st:'liberado'},
+    {id:5,al:HEITOR,dim:'part',t:'n',dt:'15/10',prof:'Prof. Rafael (Ciências)',txt:'',st:'liberado'},
+    {id:6,al:HEITOR,dim:'auto',t:'a',dt:'10/10',prof:'Prof.ª Júlia (Português)',txt:'Desistiu da leitura no primeiro trecho difícil.',st:'liberado'},
+    {id:7,al:HEITOR,dim:'conv',t:'d',dt:'08/10',prof:'Prof.ª Marta (Matemática)',txt:'Defendeu um colega de uma brincadeira ofensiva.',st:'liberado'},
+    {id:8,al:'a1',dim:'part',t:'d',dt:'24/10',prof:'Prof.ª Marta (Matemática)',txt:'',st:'liberado'}],
+  aaResp:{}, aaSent:false, contest:{aberta:true,msgs:[
+    {who:'Cláudia Almeida (responsável)',me:false,txt:'O Heitor disse que no dia 21 estava resolvendo a atividade com o colega e por isso não entregou sozinho. Podemos conversar sobre esse registro?'}]},
+  intervencoes:[
+    {id:1,al:'Heitor Almeida',t:'7º B',n:3,acao:'Conversa com família e orientação',resp:'Coord. Paula',prazo:'31/10',col:0},
+    {id:2,al:'Larissa Prado',t:'7º B',n:1,acao:'Tutoria entre pares em Matemática',resp:'Prof.ª Marta',prazo:'07/11',col:1},
+    {id:3,al:'Turma 8º A',t:'8º A',n:2,acao:'Projeto de convivência (assembleias)',resp:'Núcleo Pedagógico',prazo:'28/11',col:1},
+    {id:4,al:'Samuel Viana',t:'6º B',n:2,acao:'Plano de rotina de estudos',resp:'Orientadora Bia',prazo:'20/10',col:2},
+    {id:5,al:'Turma 1º EM A',t:'1º EM A',n:1,acao:'Oficina de organização e prazos',resp:'Prof. André',prazo:'15/10',col:2}],
+  modal:false, devSaved:false, respRead:false, filtroDim:null, nivel:0, child:'Heitor'
+};
+const ALERTAS=[
+  {nome:'Heitor Almeida',t:'7º B',n:3,dim:'Autonomia',qtd:4,freq:71,dfreq:-12,nota:'5,2',dnota:'-1,8',sp:[.8,.75,.7,.55,.45,.4],id:HEITOR},
+  {nome:'Samuel Viana',t:'6º B',n:2,dim:'Responsabilidade',qtd:3,freq:78,dfreq:-8,nota:'6,4',dnota:'-0,9',sp:[.7,.7,.65,.6,.55,.5]},
+  {nome:'Lívia Matos',t:'9º A',n:2,dim:'Participação',qtd:3,freq:83,dfreq:-6,nota:'7,1',dnota:'-1,2',sp:[.85,.8,.7,.6,.6,.55]},
+  {nome:'Larissa Prado',t:'7º B',n:1,dim:'Autonomia',qtd:3,freq:92,dfreq:-1,nota:'5,9',dnota:'-0,7',sp:[.6,.6,.58,.5,.5,.48]},
+  {nome:'Ruan Batista',t:'1º EM A',n:1,dim:'Convivência',qtd:3,freq:88,dfreq:-3,nota:'7,8',dnota:'+0,2',sp:[.7,.65,.6,.6,.55,.55]},
+  {nome:'Yasmin Freitas',t:'8º A',n:3,dim:'Participação',qtd:5,freq:64,dfreq:-18,nota:'4,9',dnota:'-2,3',sp:[.75,.6,.5,.4,.35,.3]},
+  {nome:'Enzo Carvalho',t:'2º EM A',n:1,dim:'Responsabilidade',qtd:3,freq:90,dfreq:-2,nota:'6,8',dnota:'-0,5',sp:[.7,.68,.66,.6,.58,.55]}];
+const TURMAS=['6º A','6º B','7º A','7º B','8º A','9º A','1º EM A','2º EM A'];
+const HEAT=[[8,12,10,6,5],[22,9,18,11,7],[10,7,9,14,6],[14,8,26,12,9],[11,15,13,24,28],[9,6,8,19,7],[17,10,12,9,15],[21,8,7,10,6]];
+const RAD={atual:[.45,.78,.38,.6,.82],antes:[.55,.66,.52,.62,.75],auto:[.6,.7,.55,.5,.8]};
+
+/* ================= Utilidades ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const al=id=>ALUNOS.find(a=>a.id===id);
+const dim=id=>DIMS.find(d=>d.id===id);
+const tag=t=>`<span class="tag t-${t}"><span class="sym" aria-hidden="true">${TIPOS[t].s}</span>${TIPOS[t].n}</span>`;
+const stTag=s=>s==='revisao'?'<span class="tag t-rev">Em revisão · 48 h</span>':s==='contestado'?'<span class="tag t-ct">Em diálogo</span>':'';
+function radar(series,size=280,legend=true){
+  const W=size+110,H=size,cx=W/2,cy=H/2,r=size/2-26,n=5,pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+Math.cos(a)*r*v,cy+Math.sin(a)*r*v]};
+  let g='';
+  [.25,.5,.75,1].forEach(k=>{g+=`<polygon points="${[...Array(n)].map((_,i)=>pt(i,k).join(',')).join(' ')}" fill="none" stroke="#C9DCCD"/>`});
+  for(let i=0;i<n;i++){const[x,y]=pt(i,1);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#C9DCCD"/>`;
+    const a=-Math.PI/2+i*2*Math.PI/n,lx=cx+Math.cos(a)*(r+10),ly=cy+Math.sin(a)*(r+10);
+    const anc=Math.abs(Math.cos(a))<.2?'middle':Math.cos(a)>0?'start':'end';const dy=i===0?-4:Math.sin(a)>.5?14:5;
+    g+=`<text x="${lx}" y="${ly+dy}" font-size="12.5" text-anchor="${anc}" fill="#55665A" font-weight="700">${DIMS[i].c}</text>`}
+  series.forEach(s=>{g+=`<polygon points="${s.v.map((v,i)=>pt(i,v).join(',')).join(' ')}" fill="${s.fill||'none'}" stroke="${s.cor}" stroke-width="2.5" ${s.dash?'stroke-dasharray="6 5"':''}/>`;
+    s.v.forEach((v,i)=>{const[x,y]=pt(i,v);g+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${s.cor}"/>`})});
+  const lg=legend?`<div class="legend" style="justify-content:center">${series.map(s=>`<span><i style="background:${s.cor}"></i>${s.nome}${s.dash?' (tracejado)':''}</span>`).join('')}</div>`:'';
+  return `<div><svg viewBox="0 -12 ${W} ${H+24}" width="100%" style="max-width:${W}px;display:block;margin:0 auto" role="img" aria-label="Gráfico de radar por dimensão">${g}</svg>${lg}</div>`;
+}
+function spark(arr,w=130,h=34,cor='#9A5B00'){
+  const p=arr.map((v,i)=>`${(i/(arr.length-1))*(w-6)+3},${h-3-v*(h-6)}`).join(' ');
+  const last=p.split(' ').pop().split(',');
+  return `<svg width="${w}" height="${h}" aria-hidden="true"><polyline points="${p}" fill="none" stroke="${cor}" stroke-width="2.2" stroke-linejoin="round"/><circle cx="${last[0]}" cy="${last[1]}" r="3.5" fill="${cor}"/></svg>`;
+}
+let toastTimer;
+function toast(msg,acts=[],desk=false){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const host=desk?document.body:($('.phone')||document.body);
+  const t=document.createElement('div');t.className='toast'+(desk?' desk':'');t.setAttribute('role','status');
+  t.innerHTML=`<div style="flex:1">${msg}</div>`+acts.map((a,i)=>`<button data-i="${i}">${a[0]}</button>`).join('');
+  t.querySelectorAll('button').forEach(b=>b.onclick=()=>{t.remove();acts[b.dataset.i][1]()});
+  host.appendChild(t);clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.remove(),6000);
+}
+const IC={
+ home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+ plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .8 3.2 2.6 3.5 5.2"/>',
+ chat:'<path d="M4 5h16v11H8l-4 4z"/>',
+ chart:'<path d="M12 3l8 6-3 10H7L4 9z"/><path d="M12 8l3.5 2.5-1.3 4H9.8l-1.3-4z"/>',
+ check:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 12l3 3 5-6"/>',
+ book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+ list:'<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>',
+ lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
+function mshell({perfil,head,body,tabs,cur}){
+  return `<div class="stage"><div class="stage-top"><a href="#/">← Trocar perfil</a><span class="muted">${perfil} · protótipo mobile</span></div>
+  <div class="phone">${head}<main class="m-body" id="mb">${body}</main>
+  <nav class="tabbar" aria-label="Navegação principal">${tabs.map(t=>`<a href="${t[1]}" class="${t[0]===cur?'on':''}" ${t[0]===cur?'aria-current="page"':''}><span class="ico"><svg viewBox="0 0 24 24">${IC[t[2]]}</svg></span>${t[0]}</a>`).join('')}</nav></div></div>`;
+}
+const mhead=(sub,titulo,back)=>`<header class="m-head">${back?`<a class="back" href="${back}">← Voltar</a>`:''}<div class="sub">${sub}</div><h1>${titulo}</h1></header>`;
+
+/* ================= Launcher ================= */
+function launcher(){
+  return `<div class="launch">
+   <div class="brand"><div class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div><b>Atitudes</b><div class="small muted">Instituto Federal · Ensino Básico</div></div></div>
+   <h1>Observar para acompanhar, não para punir.</h1>
+   <p class="lead">Protótipo navegável de um sistema de avaliação atitudinal formativa. Escolha um perfil para simular o login; cada perfil vê apenas as telas e os dados que lhe são permitidos.</p>
+   <div class="perfis">
+    <button class="perfil" onclick="go('#/prof')"><span class="dev">Mobile</span><h2>Professor</h2><p>Registra observações em 3 toques, consulta evidências e escreve devolutivas.</p></button>
+    <button class="perfil" onclick="go('#/coord')"><span class="dev d">Desktop</span><h2>Coordenação e Núcleo</h2><p>Alerta precoce, clima escolar, ficha 360 e intervenções.</p></button>
+    <button class="perfil" onclick="go('#/aluno')"><span class="dev">Mobile</span><h2>Estudante</h2><p>Acompanha a própria evolução, faz autoavaliação e conversa sobre registros.</p></button>
+    <button class="perfil" onclick="go('#/resp')"><span class="dev">Mobile</span><h2>Responsável</h2><p>Lê devolutivas, consulta registros liberados e gerencia a privacidade.</p></button>
+   </div>
+   <footer>Dados fictícios. Sem back-end: as ações ficam salvas apenas enquanto a página estiver aberta. Login simulado; em produção, autenticação institucional com perfil (RBAC) e consentimento LGPD no primeiro acesso.</footer>
+  </div>`;
+}
+
+/* ================= Professor ================= */
+const PTABS=[['Início','#/prof','home'],['Registrar','#/prof/registro','plus'],['Alunos','#/prof/alunos','users'],['Diálogos','#/prof/dialogos','chat']];
+function profHome(){
+  const body=`<div class="card" style="background:var(--verde-claro);border-color:var(--verde)">
+    <div class="small muted">Agora · 2ª aula · 08:50–09:40</div><h2 style="font-size:20px;margin:4px 0 2px">7º ano B · Matemática</h2>
+    <div class="small muted">Turma identificada pela sua grade horária</div>
+    <button class="btn full" style="margin-top:14px" onclick="go('#/prof/registro')">Registrar observação</button></div>
+   <div class="card" style="margin-top:12px"><div class="row between"><b>Sem registro há 15 dias</b><span class="tag t-a">3 alunos</span></div>
+    <p class="small muted" style="margin:6px 0 10px">Ajuda a distribuir o olhar e evitar que só alguns alunos sejam observados.</p>
+    <div class="row wrap">${ALUNOS.filter(a=>a.pend).map(a=>`<span class="chip">${a.curto}</span>`).join('')}</div></div>
+   <div class="card" style="margin-top:12px"><div class="row between"><b>Autoavaliação · 2º bimestre</b><span class="small muted">18 de 25</span></div>
+    <div class="bar" style="margin:10px 0"><i style="width:72%"></i></div><a href="#/prof/autoavaliacao" class="small"><b>Acompanhar respostas</b></a></div>
+   <a class="card row between" href="#/prof/dialogos" style="margin-top:12px;text-decoration:none;color:inherit"><div><b>1 contestação aguardando</b><div class="small muted">Responda até 31/10 (5 dias úteis)</div></div><span class="tag t-ct">Abrir</span></a>`;
+  return mshell({perfil:'Professor',head:mhead('Terça, 27 de outubro','Olá, Prof.ª Marta'),body,tabs:PTABS,cur:'Início'});
+}
+function profRegistro(){
+  const R=S.reg;
+  const taps=`<div class="taps" aria-live="polite">Toques <span class="${R.taps>=1?'on':''}"></span><span class="${R.taps>=2?'on':''}"></span><span class="${R.taps>=3?'on':''}"></span> </div>`;
+  const body=`<div class="row between">${taps}${R.last?`<span class="small muted">Último registro: ${R.last} toques</span>`:''}</div><label class="row small" style="gap:6px;margin-top:10px"><input type="checkbox" ${R.multi?'checked':''} onchange="S.reg.multi=this.checked;S.reg.sel=[];S.reg.taps=0;render()" style="width:18px;height:18px;accent-color:var(--verde)"> Registrar vários alunos de uma vez</label>
+   <div class="grid-alunos">${ALUNOS.map(a=>`<button class="al ${R.sel.includes(a.id)?'sel':''}" onclick="tapAluno('${a.id}')" aria-pressed="${R.sel.includes(a.id)}">${a.pend?'<span class="pend" title="Sem registro há 15 dias"></span>':''}<span class="av">${a.ini}</span>${a.curto}</button>`).join('')}</div>
+   ${R.multi&&R.sel.length?`<button class="btn full" style="margin-top:14px" onclick="S.reg.open=true;render()">Continuar com ${R.sel.length} alunos</button>`:''}
+   <p class="small muted" style="margin-top:14px"><span style="color:var(--ambar)">●</span> sem registro há 15 dias · Toque no aluno, escolha a dimensão e o tipo. O registro salva sozinho.</p>`;
+  let sheet='';
+  if(R.open){
+    const nomes=R.sel.map(id=>al(id).curto).join(', ');
+    if(R.comment){
+      sheet=`<div class="sheet-bg" onclick="if(event.target===this){closeSheet()}"><div class="sheet" role="dialog" aria-label="Comentário"><div class="grab"></div>
+       <b>Comentário opcional · ${esc(nomes)}</b><p class="small muted" style="margin:4px 0 10px">Descreva o comportamento observado, não a pessoa. Evite diagnósticos ou rótulos.</p>
+       <textarea id="cm" placeholder="Ex.: Ajudou o grupo a dividir as tarefas do experimento."></textarea>
+       <button class="btn full" style="margin-top:12px" onclick="salvarComentario()">Salvar comentário</button></div></div>`;
+    }else if(!R.dim){
+      sheet=`<div class="sheet-bg" onclick="if(event.target===this){closeSheet()}"><div class="sheet" role="dialog" aria-label="Escolher dimensão"><div class="grab"></div>
+       <div class="row between"><b>${esc(nomes)}</b><span class="small muted">2 de 3</span></div>
+       <div class="dimbtns">${DIMS.map(d=>`<button class="dimbtn" onclick="tapDim('${d.id}')"><span>${d.n}</span><span class="small muted" style="font-weight:400">${d.d}</span></button>`).join('')}</div></div></div>`;
+    }else{
+      sheet=`<div class="sheet-bg" onclick="if(event.target===this){closeSheet()}"><div class="sheet" role="dialog" aria-label="Escolher tipo"><div class="grab"></div>
+       <div class="row between"><b>${esc(nomes)} · ${dim(R.dim).n}</b><span class="small muted">3 de 3</span></div>
+       <div class="tipos">${Object.entries(TIPOS).map(([k,t])=>`<button class="tipo ${k}" onclick="tapTipo('${k}')"><span class="s" aria-hidden="true">${t.s}</span>${t.n}</button>`).join('')}</div>
+       <button class="btn sec full sm" style="margin-top:12px" onclick="S.reg.dim=null;S.reg.taps--;render()">Trocar dimensão</button></div></div>`;
+    }
+  }
+  return mshell({perfil:'Professor',head:mhead('7º ano B · Matemática','Registro rápido','#/prof'),body,tabs:PTABS,cur:'Registrar'}).replace('</main>','</main>'+sheet);
+}
+function tapAluno(id){const R=S.reg;
+  if(R.multi){R.sel=R.sel.includes(id)?R.sel.filter(x=>x!==id):[...R.sel,id];R.taps=R.sel.length?1:0;render();return}
+  R.sel=[id];R.taps=1;R.dim=null;R.open=true;R.comment=false;render()}
+function tapDim(d){S.reg.dim=d;S.reg.taps=2;render()}
+function tapTipo(t){const R=S.reg;R.taps=3;
+  const novos=R.sel.map(id=>({id:Date.now()+Math.random(),al:id,dim:R.dim,t,dt:'27/10',prof:'Prof.ª Marta (Matemática)',txt:'',st:'revisao'}));
+  S.registros.unshift(...novos);
+  const nomes=R.sel.map(id=>al(id).curto).join(', '),dn=dim(R.dim).n;
+  R.last=R.multi?R.sel.length+2:3;R.open=false;R.dim=null;const sel=[...R.sel];R.taps=0;R.sel=[];render();
+  toast(`<b>Salvo</b> · ${esc(nomes)} · ${dn} · ${TIPOS[t].n}`,[
+    ['Desfazer',()=>{S.registros=S.registros.filter(r=>!novos.includes(r));toast('Registro desfeito')}],
+    ['Comentar',()=>{S.reg.sel=sel;S.reg.open=true;S.reg.comment=true;S.reg.novos=novos;render()}]]);
+}
+function salvarComentario(){const v=$('#cm').value.trim();(S.reg.novos||[]).forEach(r=>r.txt=v);S.reg.open=false;S.reg.comment=false;S.reg.sel=[];render();toast(v?'Comentário salvo':'Registro salvo sem comentário')}
+function closeSheet(){Object.assign(S.reg,{open:false,dim:null,sel:[],taps:0,comment:false});render()}
+
+function profAlunos(){
+  const body=`<input type="text" placeholder="Buscar aluno do 7º ano B" aria-label="Buscar aluno" oninput="document.querySelectorAll('.list-btn').forEach(b=>b.hidden=!b.textContent.toLowerCase().includes(this.value.toLowerCase()))">
+   <div style="margin-top:8px">${ALUNOS.map(a=>`<button class="list-btn" onclick="go('#/prof/aluno/${a.id}')"><span class="row"><span class="al" style="border:0;padding:0"><span class="av" style="width:36px;height:36px;font-size:13px">${a.ini}</span></span>${a.nome}</span><span class="small muted">${S.registros.filter(r=>r.al===a.id).length} registros ›</span></button>`).join('')}</div>`;
+  return mshell({perfil:'Professor',head:mhead('7º ano B','Alunos'),body,tabs:PTABS,cur:'Alunos'});
+}
+function profAluno(id){
+  const a=al(id)||al(HEITOR);const EU='Prof.ª Marta';
+  const doAluno=S.registros.filter(r=>r.al===a.id),outros=doAluno.filter(r=>!r.prof.startsWith(EU)).length;
+  const regs=doAluno.filter(r=>r.prof.startsWith(EU)&&(!S.filtroDim||r.dim===S.filtroDim));
+  const acomp=ALERTAS.some(x=>x.id===a.id);
+  const body=`${acomp?`<div class="note" style="margin-bottom:14px;background:#E8EEFC;color:var(--azul)"><b>Em acompanhamento:</b> a coordenação está acompanhando ${a.curto}. Detalhes com a Coord. Paula.</div>`:''}${radar([{nome:'Out/2026',v:RAD.atual,cor:'#2F9E41',fill:'rgba(47,158,65,.15)'},{nome:'1º bim.',v:RAD.antes,cor:'#55665A',dash:1}],260)}
+   <div class="row wrap" style="margin:14px 0"><button class="chip ${!S.filtroDim?'on':''}" onclick="S.filtroDim=null;render()">Todas</button>${DIMS.map(d=>`<button class="chip ${S.filtroDim===d.id?'on':''}" onclick="S.filtroDim='${d.id}';render()">${d.c}</button>`).join('')}</div>
+   <h2 style="font-size:16px;margin-bottom:10px">Seus registros</h2><ul class="tl">${regs.length?regs.map(r=>`<li><div class="row wrap" style="gap:6px">${tag(r.t)}<b style="font-size:14.5px">${dim(r.dim).n}</b>${stTag(r.st)}</div>${r.txt?`<div style="font-size:14.5px;margin-top:4px">${esc(r.txt)}</div>`:''}<div class="meta">${r.dt} · ${r.prof}</div></li>`).join(''):'<li class="muted">Nenhum registro seu nesta dimensão. Use o registro rápido durante a aula.</li>'}</ul>
+   <div class="card row between" style="margin-bottom:14px"><div><b>Outros professores</b><div class="small muted">Detalhes visíveis só para a coordenação</div></div><span class="tag t-n">${outros} registro${outros===1?'':'s'}</span></div>
+   <button class="btn full" onclick="go('#/prof/devolutiva/${a.id}')">Escrever devolutiva</button>`;
+  return mshell({perfil:'Professor',head:mhead('Histórico de evidências',a.nome,'#/prof/alunos'),body,tabs:PTABS,cur:'Alunos'});
+}
+function profDevolutiva(id){
+  const a=al(id)||al(HEITOR);
+  const body=S.devSaved?`<div class="card stack" style="text-align:center"><div style="font-size:40px;color:var(--verde)">✓</div><h2 style="font-size:20px">Devolutiva liberada</h2><p class="muted small">${a.curto} e a família foram notificados. A leitura fica registrada no histórico.</p><button class="btn sec full" onclick="S.devSaved=false;go('#/prof/aluno/${a.id}')">Voltar ao histórico</button></div>`:
+  `<p class="small muted" style="margin-top:0">Compare o que você observou com a autoavaliação do aluno antes da conversa.</p>
+   ${radar([{nome:'Observações',v:RAD.atual,cor:'#2F9E41',fill:'rgba(47,158,65,.15)'},{nome:'Autoavaliação',v:RAD.auto,cor:'#1D4ED8',dash:1}],260)}
+   <div class="note" style="margin:14px 0"><b>Maior diferença:</b> Autonomia — você observou menos do que ${a.curto} percebe em si. Bom ponto de partida para a conversa.</div>
+   <label class="small"><b>Pontos fortes</b></label><textarea>Você tem ajudado os colegas com paciência e defende quem está sendo desrespeitado.</textarea>
+   <label class="small" style="display:block;margin-top:10px"><b>O que vamos desenvolver</b></label><textarea>Pedir ajuda quando trava numa atividade, em vez de parar.</textarea>
+   <label class="small" style="display:block;margin-top:10px"><b>Meta combinada</b></label><input type="text" value="Levantar a mão ao menos uma vez por aula quando tiver dúvida.">
+   <label class="check" style="margin-top:14px"><input type="checkbox" checked> Liberar para o estudante e a família</label>
+   <button class="btn full" style="margin-top:14px" onclick="S.devSaved=true;render()">Salvar e liberar devolutiva</button>`;
+  return mshell({perfil:'Professor',head:mhead('Devolutiva individual · 2º bimestre',a.nome,'#/prof/aluno/'+a.id),body,tabs:PTABS,cur:'Alunos'});
+}
+function profAutoaval(){
+  const faltam=['Bruno Lima','Kauã Ribeiro','Natália Gomes','Otávio Mendes','Pietra Castro','Davi Rocha','Miguel Torres'];
+  const body=S.aaSent?`<div class="card"><b>Nova rodada enviada</b><p class="small muted">Os alunos do 7º ano B receberam a autoavaliação. Ela fica aberta até 06/11.</p></div>`:
+  `<div class="card"><div class="row between"><b>Rodada atual</b><span class="small muted">até 30/10</span></div><div class="bar" style="margin:10px 0"><i style="width:72%"></i></div><div class="small">18 de 25 responderam</div>
+   <div class="small muted" style="margin-top:10px">Ainda não responderam:</div><div class="row wrap" style="margin-top:6px">${faltam.map(n=>`<span class="chip">${n.split(' ')[0]}</span>`).join('')}</div>
+   <button class="btn sec sm" style="margin-top:12px" onclick="toast('Lembrete enviado a 7 alunos')">Enviar lembrete</button></div>
+   <h2 style="font-size:17px;margin:20px 0 10px">Nova autoavaliação</h2>
+   <div class="card stack"><div class="small muted">Dimensões incluídas</div><div class="row wrap">${DIMS.map(d=>`<button class="chip on" onclick="this.classList.toggle('on')">${d.c}</button>`).join('')}</div>
+   <label class="small"><b>Turma</b></label><select><option>7º ano B</option><option>7º ano A</option></select>
+   <button class="btn full" onclick="S.aaSent=true;render()">Enviar para a turma</button></div>`;
+  return mshell({perfil:'Professor',head:mhead('7º ano B','Autoavaliação','#/prof'),body,tabs:PTABS,cur:'Início'});
+}
+function profDialogos(){
+  const C=S.contest;
+  const body=`<div class="card"><div class="row between"><b>Registro de 21/10 · Heitor</b>${C.aberta?'<span class="tag t-ct">Aguardando você</span>':'<span class="tag t-d">Respondido</span>'}</div>
+   <div class="row wrap" style="gap:6px;margin-top:8px">${tag('a')}<span class="small">Autonomia · Prof.ª Marta</span></div></div>
+   <div class="stack" style="margin-top:14px">${C.msgs.map(m=>`<div class="msg ${m.me?'me':'them'}"><div class="who">${m.who}</div>${esc(m.txt)}</div>`).join('')}</div>
+   ${C.aberta?`<div class="card" style="margin-top:14px"><b class="small">Como você quer responder?</b>
+    <div class="seg" style="grid-template-columns:1fr 1fr 1fr"><button class="on" onclick="selSeg(this)">Manter</button><button onclick="selSeg(this)">Ajustar tipo</button><button onclick="selSeg(this)">Adicionar contexto</button></div>
+    <textarea id="resp" style="margin-top:10px" placeholder="Explique o que foi observado. A conversa fica registrada."></textarea><div id="er" class="err" hidden>Escreva uma resposta antes de enviar.</div>
+    <button class="btn full" style="margin-top:10px" onclick="responderContest('Prof.ª Marta')">Enviar resposta</button>
+    <p class="small muted" style="margin:8px 0 0">Sem resposta em 5 dias úteis, a conversa é encaminhada à coordenação. O registro nunca é apagado: fica sinalizado como “em diálogo”.</p></div>`:''}`;
+  return mshell({perfil:'Professor',head:mhead('Contestações e conversas','Diálogos'),body,tabs:PTABS,cur:'Diálogos'});
+}
+function selSeg(b){b.parentNode.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+function responderContest(who){const t=$('#resp'),v=t.value.trim();if(!v){$('#er').hidden=false;t.oninput=()=>$('#er').hidden=true;return}
+  S.contest.msgs.push({who,me:true,txt:v});S.contest.aberta=false;render();toast('Resposta enviada · a família foi notificada')}
+
+/* ================= Coordenação ================= */
+const CNAV=[['Visão geral','#/coord'],['Alerta precoce','#/coord/alertas',ALERTAS.length],['Turmas','#/coord/turma'],['Clima escolar','#/coord/clima'],['Intervenções','#/coord/intervencoes'],['Configurações e auditoria','#/coord/config']];
+function dshell(cur,body){
+  return `<div class="desk"><nav class="side" aria-label="Menu da coordenação"><div class="brand"><div class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div><b>Atitudes</b><div class="small" style="opacity:.8">Coordenação</div></div></div>
+   ${CNAV.map(n=>`<a href="${n[1]}" class="${n[0]===cur?'on':''}">${n[0]}${n[2]?`<span class="count">${n[2]}</span>`:''}</a>`).join('')}
+   <div class="foot">Coord. Paula Santos<br>Núcleo Pedagógico<br><a href="#/">← Trocar perfil</a></div></nav><main class="main">${body}</main></div>${S.modal?modalInterv():''}`;
+}
+const nivelTag=n=>`<span class="nivel n${n}"><span aria-hidden="true">${'■'.repeat(n)}${'□'.repeat(3-n)}</span>Nível ${n}</span>`;
+function alertCard(a){
+  return `<article class="ac n${a.n}"><div class="row between"><div><b style="font-size:17px">${a.nome}</b><div class="small muted">${a.t}</div></div>${nivelTag(a.n)}</div>
+   <div class="inds"><div class="ind bad"><div class="k">Atitudinal</div><div class="v">${a.qtd}<span class="sym">◆</span></div><div>${a.dim} · 15 dias</div></div>
+   <div class="ind ${a.dfreq<=-5?'bad':'ok'}"><div class="k">Frequência</div><div class="v">${a.freq}%</div><div>${a.dfreq} p.p. no mês</div></div>
+   <div class="ind ${parseFloat(a.dnota.replace(',','.'))<=-1?'bad':'ok'}"><div class="k">Notas</div><div class="v">${a.nota}</div><div>${a.dnota} no bimestre</div></div></div>
+   <div class="row between"><span class="small muted">Tendência ${spark(a.sp,90,26)}</span><span class="row"><button class="btn sec sm" onclick="go('#/coord/aluno')">Ficha 360</button><button class="btn sm" onclick="S.modal={al:'${a.nome}',t:'${a.t}',n:${a.n}};render()">Planejar</button></span></div></article>`;
+}
+function coordHome(){
+  const body=`<div class="row between wrap"><h1>Visão geral</h1><span class="muted small">Atualizado hoje, 08:00 · 2º bimestre</span></div>
+   <div class="kpis" style="margin-top:18px">
+    <a class="kpi warn" href="#/coord/alertas"><div class="small muted">Alertas abertos</div><div class="v">${ALERTAS.length}</div><div class="small">${ALERTAS.filter(a=>a.n===3).length} de nível 3</div></a>
+    <a class="kpi" href="#/coord/intervencoes"><div class="small muted">Intervenções em andamento</div><div class="v">${S.intervencoes.filter(i=>i.col===1).length}</div><div class="small">${S.intervencoes.filter(i=>i.col===0).length} planejadas</div></a>
+    <div class="kpi"><div class="small muted">Contestações abertas</div><div class="v">${S.contest.aberta?2:1}</div><div class="small">prazo médio de resposta 2,4 dias</div></div>
+    <div class="kpi"><div class="small muted">Cobertura de registros</div><div class="v">86%</div><div class="small">alunos com registro em 15 dias</div></div></div>
+   <div class="g2"><section><h2 style="font-size:18px;margin-bottom:10px">Prioridade de hoje</h2><div class="stack">${ALERTAS.filter(a=>a.n===3).map(alertCard).join('')}</div></section>
+    <section class="card"><div class="row between"><h2 style="font-size:18px">Clima por dimensão</h2><a class="small" href="#/coord/clima"><b>Ver mapa completo</b></a></div>
+     <p class="small muted">% de registros “A desenvolver” nos últimos 30 dias</p>${heatmap(TURMAS.slice(0,5),HEAT.slice(0,5))}</section></div>`;
+  return dshell('Visão geral',body);
+}
+function heatColor(v){if(v>=24)return['#F6C47A','#6B3D00'];if(v>=18)return['#FBE3BF','#7A4300'];if(v>=12)return['#FDF1DC','#9A5B00'];return['#EAF6EC','#17502A']}
+function heatmap(turmas,data,sel){
+  return `<div class="heat" style="grid-template-columns:72px repeat(5,1fr)" role="table" aria-label="Mapa de calor turma por dimensão"><div></div>${DIMS.map(d=>`<div class="h">${d.c}</div>`).join('')}
+   ${turmas.map((t,i)=>{const on=sel===t;return`<div class="h" style="align-items:center;${on?'color:var(--verde-esc)':''}">${on?'▶ ':''}${t}</div>${data[i].map(v=>{const[b,c]=heatColor(v);return`<div class="c" style="background:${b};color:${c};${on?'box-shadow:inset 0 0 0 2px #17502A':''}">${v}%</div>`}).join('')}`}).join('')}</div>
+   <div class="legend" style="margin-top:10px"><span><i style="background:#EAF6EC"></i>abaixo de 12%</span><span><i style="background:#FDF1DC"></i>12–17%</span><span><i style="background:#FBE3BF"></i>18–23%</span><span><i style="background:#F6C47A"></i>24% ou mais</span></div>`;
+}
+function coordAlertas(){
+  const lista=ALERTAS.filter(a=>(!S.nivel||a.n===S.nivel)&&(!S.fTurma||a.t===S.fTurma)).sort((a,b)=>b.n-a.n);
+  const body=`<h1>Alerta precoce</h1>
+   <div class="toolbar">${[0,3,2,1].map(n=>`<button class="chip ${S.nivel===n?'on':''}" onclick="S.nivel=${n};render()">${n?'Nível '+n:'Todos'}</button>`).join('')}<select aria-label="Turma" onchange="S.fTurma=this.value;render(true)"><option value="">Todas as turmas</option>${TURMAS.map(t=>`<option ${S.fTurma===t?'selected':''}>${t}</option>`).join('')}</select>
+    <span class="small muted" style="margin-left:auto">Regra: 3+ registros “A desenvolver” na mesma dimensão em 15 dias, cruzados com frequência e notas</span></div>
+   <div class="alertas">${lista.length?lista.map(alertCard).join(''):'<div class="card muted">Nenhum alerta com esses filtros. Bom sinal: continue acompanhando pelos registros da turma.</div>'}</div>
+   <div class="note" style="margin-top:20px"><b>Uso do alerta:</b> indica que um estudante precisa de atenção, não classifica o estudante. Professores veem apenas os alertas dos seus alunos, e a família só é envolvida por meio de uma intervenção planejada.</div>`;
+  return dshell('Alerta precoce',body);
+}
+function coordAluno(){
+  const regs=S.registros.filter(r=>r.al===HEITOR);
+  const body=`<a href="#/coord/alertas" class="small"><b>← Alerta precoce</b></a>
+   <div class="row between wrap" style="margin-top:8px"><div><h1>Heitor Almeida</h1><div class="muted">7º ano B · 13 anos · Responsável: Cláudia Almeida</div></div><div class="row">${nivelTag(3)}<button class="btn" onclick="S.modal={al:'Heitor Almeida',t:'7º B',n:3};render()">Planejar intervenção</button></div></div>
+   <div class="g3" style="margin-top:18px">
+    <section class="card"><h2 style="font-size:16px;margin-bottom:6px">Perfil atitudinal</h2>${radar([{nome:'Out/2026',v:RAD.atual,cor:'#2F9E41',fill:'rgba(47,158,65,.15)'},{nome:'1º bim.',v:RAD.antes,cor:'#55665A',dash:1}],250)}</section>
+    <section class="card stack"><h2 style="font-size:16px">Frequência semanal</h2><div class="row between"><span style="font-size:30px;font-weight:700;color:var(--ambar)">71%</span>${spark([.95,.92,.9,.82,.75,.7,.71],150,44)}</div><p class="small muted" style="margin:0">Abaixo de 75%, mínimo exigido pela LDB. Faltas concentradas às segundas.</p>
+     <h2 style="font-size:16px;padding-top:8px">Notas por bimestre</h2><table class="t"><tr><th>Disciplina</th><th>1º</th><th>2º</th></tr><tr><td>Matemática</td><td>6,8</td><td style="color:var(--ambar);font-weight:700">4,9 ▼</td></tr><tr><td>Português</td><td>7,2</td><td style="color:var(--ambar);font-weight:700">5,6 ▼</td></tr><tr><td>Ciências</td><td>7,0</td><td>6,9</td></tr></table></section>
+    <section class="card"><h2 style="font-size:16px;margin-bottom:12px">Registros · todos os professores</h2><ul class="tl">${regs.slice(0,6).map(r=>`<li><div class="row wrap" style="gap:6px">${tag(r.t)}<b style="font-size:14px">${dim(r.dim).n}</b>${stTag(r.st)}</div><div class="meta">${r.dt} · ${r.prof}</div></li>`).join('')}</ul></section></div>
+   <section class="card" style="margin-top:16px"><h2 style="font-size:16px;margin-bottom:8px">Histórico de intervenções</h2><table class="t"><tr><th>Data</th><th>Ação</th><th>Responsável</th><th>Situação</th></tr>
+    <tr><td>05/09</td><td>Conversa individual sobre rotina de estudos</td><td>Prof.ª Júlia</td><td><span class="tag t-d">Concluída</span></td></tr>
+    ${S.intervencoes.filter(i=>i.al==='Heitor Almeida').map(i=>`<tr><td>até ${i.prazo}</td><td>${esc(i.acao)}</td><td>${esc(i.resp)}</td><td><span class="tag ${i.col===2?'t-d':'t-rev'}">${['Planejada','Em andamento','Concluída'][i.col]}</span></td></tr>`).join('')}</table></section>`;
+  return dshell('Alerta precoce',body);
+}
+function rng(seed){return()=>{seed=(seed*9301+49297)%233280;return seed/233280}}
+const POOL=['Alice','Arthur','Beatriz','Benício','Cecília','Cauã','Clara','Daniel','Eduarda','Enzo','Fernanda','Gabriel','Helena','Igor','Júlia','Lucas','Manuela','Matheus','Nicolas','Olívia','Pedro','Rafaela','Samuel','Sofia','Theo','Valentina','Vitor','Yasmin'];
+const SOBR=['Alves','Barbosa','Campos','Duarte','Esteves','Fonseca','Guedes','Lopes','Moura','Pinto','Queiroz','Sales','Teixeira','Vieira'];
+const BIM={'1':'1º bimestre','2':'2º bimestre'};
+function heatBim(ti,bim){return HEAT[ti].map((v,j)=>bim==='2'?v:Math.max(4,v-7+((ti*3+j)%6)))}
+function dadosTurma(turma,bim){
+  const ti=TURMAS.indexOf(turma),r=rng(ti*31+(+bim)*7+3),a=heatBim(ti,bim);
+  const dist=a.map(x=>{const d=Math.round(30+r()*25);return[d,100-d-x,x]});
+  let alunos;
+  if(turma==='7º B')alunos=ALUNOS.map(x=>({nome:x.nome,id:x.id}));
+  else{const used=new Set();alunos=[];const n=12+Math.floor(r()*6);
+    while(alunos.length<n){const nm=POOL[Math.floor(r()*POOL.length)]+' '+SOBR[Math.floor(r()*SOBR.length)];if(!used.has(nm)){used.add(nm);alunos.push({nome:nm})}}
+    alunos.sort((x,y)=>x.nome.localeCompare(y.nome,'pt'))}
+  alunos.forEach(al=>{al.sim=a.map((x,j)=>{if(al.id===HEITOR&&j===2&&bim==='2')return'a';const v=r()*100;return v<x?'a':v<x+dist[j][0]?'d':'n'})});
+  return{dist,alunos,profs:5+Math.floor(r()*3),regs:Math.round(alunos.length*(bim==='2'?8.5:7)*(0.9+r()*0.3))};
+}
+function coordTurma(){
+  const T=S.fTurma||'7º B',B=S.bim||'2',D=dadosTurma(T,B);
+  const mx=D.dist.reduce((m,d,i)=>d[2]>D.dist[m][2]?i:m,0);
+  const body=`<h1>Turma ${T}</h1><div class="toolbar">
+    <select aria-label="Turma" onchange="S.fTurma=this.value;render(true)">${TURMAS.map(t=>`<option ${t===T?'selected':''}>${t}</option>`).join('')}</select>
+    <select aria-label="Período" onchange="S.bim=this.value;render(true)">${Object.entries(BIM).map(([k,v])=>`<option value="${k}" ${k===B?'selected':''}>${v}</option>`).join('')}</select>
+    <span class="small muted">${D.alunos.length} alunos · ${D.profs} professores · ${D.regs} registros no ${BIM[B]}</span></div>
+   <div class="g2" style="margin-top:0"><section class="card"><h2 style="font-size:17px;margin-bottom:12px">Distribuição dos registros por dimensão</h2>
+    <div class="stack">${DIMS.map((d,i)=>`<div><div class="row between small"><b>${d.n}</b><span class="muted">${D.dist[i][2]}% a desenvolver</span></div><div class="stackbar" style="margin-top:4px"><i style="width:${D.dist[i][0]}%;background:#2F9E41"></i><i style="width:${D.dist[i][1]}%;background:#C9D3CC"></i><i style="width:${D.dist[i][2]}%;background:#E9A23B"></i></div></div>`).join('')}</div>
+    <div class="legend" style="margin-top:12px"><span><i style="background:#2F9E41"></i>▲ Destaque</span><span><i style="background:#C9D3CC"></i>● Neutro</span><span><i style="background:#E9A23B"></i>◆ A desenvolver</span></div>
+    <div class="note" style="margin-top:14px"><b>Leitura:</b> ${DIMS[mx].n} concentra ${D.dist[mx][2]}% de registros “A desenvolver” no ${BIM[B]}.${D.dist[mx][2]>=18?' Sugere ação coletiva na turma, não apenas casos individuais.':' Nenhuma dimensão exige ação coletiva neste período.'}</div></section>
+    <section class="card"><h2 style="font-size:17px">Alunos</h2><p class="small muted" style="margin:4px 0 8px">Ordem alfabética. O sistema não calcula pontuação nem posição.</p>
+     <table class="t"><tr><th>Aluno</th>${DIMS.map(d=>`<th title="${d.n}">${d.c.slice(0,4)}.</th>`).join('')}</tr>${D.alunos.map(a=>`<tr><td>${a.id===HEITOR?'<a href="#/coord/aluno">'+a.nome+'</a>':a.nome}</td>${a.sim.map(s=>`<td><span class="tag t-${s}" style="padding:2px 7px" title="${TIPOS[s].n}">${TIPOS[s].s}</span></td>`).join('')}</tr>`).join('')}</table>
+     <p class="small muted">Símbolo = tipo mais frequente no período.</p></section></div>`;
+  return dshell('Turmas',body);
+}
+function coordClima(){
+  const P=S.bim||'2',G=S.climaSeg||'',idx=TURMAS.map((t,i)=>i).filter(i=>!G||(G==='EM')===TURMAS[i].includes('EM'));
+  const body=`<h1>Clima escolar</h1><div class="toolbar"><select aria-label="Período" onchange="S.bim=this.value;render(true)">${Object.entries(BIM).map(([k,v])=>`<option value="${k}" ${k===P?'selected':''}>${v}</option>`).join('')}</select><select aria-label="Segmento" onchange="S.climaSeg=this.value;render(true)"><option value="">Todos os segmentos</option><option value="F2" ${G==='F2'?'selected':''}>Fundamental II</option><option value="EM" ${G==='EM'?'selected':''}>Ensino Médio</option></select></div>
+   <div class="g2" style="margin-top:0;grid-template-columns:1.5fr 1fr"><section class="card"><h2 style="font-size:17px;margin-bottom:4px">Turma × dimensão</h2><p class="small muted" style="margin:0 0 12px">% de registros “A desenvolver”. Somente dados agregados; células com menos de 5 alunos ficam ocultas.</p>${heatmap(idx.map(i=>TURMAS[i]),idx.map(i=>heatBim(i,P)),S.fTurma)}</section>
+    <section class="stack"><div class="card"><h2 style="font-size:17px;margin-bottom:10px">Maiores variações no mês</h2>
+     <table class="t"><tr><th>Turma</th><th>Dimensão</th><th>Variação</th></tr><tr><td>8º A</td><td>Convivência</td><td style="color:var(--ambar);font-weight:700">+11 p.p. ▲</td></tr><tr><td>7º B</td><td>Autonomia</td><td style="color:var(--ambar);font-weight:700">+9 p.p. ▲</td></tr><tr><td>6º B</td><td>Responsabilidade</td><td style="color:var(--ambar);font-weight:700">+7 p.p. ▲</td></tr><tr><td>9º A</td><td>Colaboração</td><td style="color:var(--verde-esc);font-weight:700">−6 p.p. ▼</td></tr></table></div>
+     <div class="card"><h2 style="font-size:17px">Percepção dos estudantes</h2><p class="small muted" style="margin:4px 0 10px">Autoavaliação: “Me sinto respeitado(a) na escola”</p>${['Fundamental II','Ensino Médio'].map((s,i)=>`<div class="small row between"><span>${s}</span><b>${[74,68][i]}% quase sempre ou sempre</b></div><div class="bar" style="margin:6px 0 12px"><i style="width:${[74,68][i]}%"></i></div>`).join('')}</div></section></div>`;
+  return dshell('Clima escolar',body);
+}
+function coordInterv(){
+  const cols=['Planejada','Em andamento','Concluída'];
+  const body=`<div class="row between wrap"><h1>Intervenções pedagógicas</h1><button class="btn" onclick="S.modal={al:'',t:'',n:1};render()">Nova intervenção</button></div><p class="muted small">Modelo de suporte em níveis (MTSS): 1 = sala de aula, 2 = grupo ou acompanhamento, 3 = individual com família e equipe.</p>
+   <div class="kanban" style="margin-top:12px">${cols.map((c,ci)=>`<section class="col"><h3>${c} · ${S.intervencoes.filter(i=>i.col===ci).length}</h3>${S.intervencoes.filter(i=>i.col===ci).map(i=>`<div class="kc"><div class="row between"><b>${esc(i.al)}</b>${nivelTag(i.n)}</div><div style="margin:6px 0">${esc(i.acao)}</div><div class="small muted">${esc(i.resp)} · prazo ${i.prazo}</div>${ci<2?`<button class="btn sec sm" style="margin-top:8px" onclick="moverInt(${i.id})">${ci===0?'Iniciar':'Concluir'}</button>`:''}</div>`).join('')}</section>`).join('')}</div>`;
+  return dshell('Intervenções',body);
+}
+function moverInt(id){const i=S.intervencoes.find(x=>x.id===id);i.col++;render();toast('Intervenção movida para “'+['Planejada','Em andamento','Concluída'][i.col]+'”',[],true)}
+function modalInterv(){const m=S.modal;
+  return `<div class="modal-bg" onclick="if(event.target===this){S.modal=false;render()}"><div class="modal stack" role="dialog" aria-label="Planejar intervenção"><h2 style="font-size:20px">Planejar intervenção</h2>
+   <div><label class="small"><b>Estudante ou turma</b></label><input type="text" id="mi-al" value="${esc(m.al)}"><div id="mi-er" class="err" hidden>Informe o estudante ou a turma.</div></div>
+   <div class="row"><div style="flex:1"><label class="small"><b>Nível</b></label><select id="mi-n">${[1,2,3].map(n=>`<option ${m.n===n?'selected':''} value="${n}">Nível ${n}</option>`).join('')}</select></div><div style="flex:1"><label class="small"><b>Prazo</b></label><input type="text" id="mi-p" value="06/11"></div></div>
+   <div><label class="small"><b>Ação</b></label><select id="mi-a"><option>Conversa com família e orientação</option><option>Tutoria entre pares</option><option>Plano de rotina de estudos</option><option>Projeto coletivo de convivência</option></select></div>
+   <div><label class="small"><b>Responsável</b></label><select id="mi-r"><option>Coord. Paula</option><option>Orientadora Bia</option><option>Prof.ª Marta</option></select></div>
+   <label class="check"><input type="checkbox" checked> Notificar a família com linguagem formativa</label>
+   <div class="row" style="justify-content:flex-end"><button class="btn sec" onclick="S.modal=false;render()">Cancelar</button><button class="btn" onclick="salvarInt()">Salvar intervenção</button></div></div></div>`;
+}
+function salvarInt(){const v=$('#mi-al').value.trim();if(!v){$('#mi-er').hidden=false;$('#mi-al').oninput=()=>$('#mi-er').hidden=true;return}
+  S.intervencoes.push({id:Date.now(),al:v,t:S.modal.t,n:+$('#mi-n').value,acao:$('#mi-a').value,resp:$('#mi-r').value,prazo:$('#mi-p').value,col:0});S.modal=false;render();toast('Intervenção salva em “Planejada”',[['Ver quadro',()=>go('#/coord/intervencoes')]],true)}
+function coordConfig(){
+  const log=[['27/10 08:52','Prof.ª Marta','Criou registro','Bruno Lima · Participação'],['27/10 08:10','Coord. Paula','Abriu ficha 360','Heitor Almeida'],['26/10 19:30','Cláudia Almeida','Abriu contestação','Registro de 21/10'],['26/10 14:02','Prof. Rafael','Liberou devolutiva','Lívia Matos'],['25/10 10:15','Núcleo Pedagógico','Alterou regra de alerta','Janela: 15 dias']];
+  const body=`<h1>Configurações e auditoria</h1><div class="g2"><section class="card"><h2 style="font-size:17px;margin-bottom:10px">Dimensões atitudinais</h2><p class="small muted" style="margin-top:0">Ajustáveis pela escola. Referências: BNCC (competências 8, 9 e 10) e CASEL.</p>
+   <table class="t"><tr><th>Dimensão</th><th>Descritores</th><th>Ativa</th></tr>${DIMS.map(d=>`<tr><td><b>${d.n}</b></td><td class="small">${d.d}</td><td><input type="checkbox" checked aria-label="Ativar ${d.n}" style="width:18px;height:18px;accent-color:var(--verde)"></td></tr>`).join('')}</table>
+   <h2 style="font-size:17px;margin:18px 0 10px">Regra do alerta precoce</h2><div class="row wrap"><div style="flex:1;min-width:140px"><label class="small"><b>Registros “A desenvolver”</b></label><input type="number" value="3" min="2"></div><div style="flex:1;min-width:140px"><label class="small"><b>Janela (dias)</b></label><input type="number" value="15"></div><div style="flex:1;min-width:140px"><label class="small"><b>Frequência abaixo de</b></label><input type="number" value="80"></div></div>
+   <button class="btn sm" style="margin-top:12px" onclick="toast('Regra salva · alteração registrada na auditoria',[],true)">Salvar regra</button></section>
+   <section class="card"><h2 style="font-size:17px;margin-bottom:10px">Log de auditoria</h2><table class="t"><tr><th>Quando</th><th>Quem</th><th>Ação</th><th>Alvo</th></tr>${log.map(l=>`<tr>${l.map(c=>`<td class="small">${c}</td>`).join('')}</tr>`).join('')}</table>
+   <div class="note" style="margin-top:14px"><b>LGPD:</b> registros guardados até o fim do ano letivo seguinte; acesso por perfil; toda leitura de ficha individual é registrada.</div></section></div>`;
+  return dshell('Configurações e auditoria',body);
+}
+
+/* ================= Estudante ================= */
+const ETABS=[['Evolução','#/aluno','chart'],['Autoavaliar','#/aluno/autoavaliacao','check'],['Devolutivas','#/aluno/devolutivas','book'],['Registros','#/aluno/registros','list']];
+function alunoHome(){
+  const frases=[['Colaboração','cresceu desde o 1º bimestre','d'],['Respeito e convivência','é um ponto forte seu','d'],['Autonomia','é o que vamos desenvolver juntos','a']];
+  const body=`${radar([{nome:'Agora',v:RAD.atual,cor:'#2F9E41',fill:'rgba(47,158,65,.15)'},{nome:'1º bimestre',v:RAD.antes,cor:'#55665A',dash:1}],280)}
+   <div class="note" style="margin:14px 0"><b>Só você:</b> este gráfico compara você com você mesmo. Ninguém da turma vê seus dados.</div>
+   <div class="stack">${frases.map(f=>`<div class="card row" style="padding:12px 14px">${tag(f[2])}<div><b>${f[0]}</b> <span class="muted">${f[1]}</span></div></div>`).join('')}</div>
+   <div class="card" style="margin-top:12px;background:var(--verde-claro);border-color:var(--verde)"><b>Sua autoavaliação está aberta</b><p class="small muted" style="margin:4px 0 10px">Leva uns 3 minutos. Fecha na sexta, 30/10.</p><button class="btn full" onclick="go('#/aluno/autoavaliacao')">Responder agora</button></div>`;
+  return mshell({perfil:'Estudante',head:mhead('7º ano B','Oi, Heitor'),body,tabs:ETABS,cur:'Evolução'});
+}
+function alunoAuto(){
+  const ops=['Ainda não','Às vezes','Quase sempre','Sempre'];
+  const perg={resp:'Entrego as atividades no prazo e cuido do meu material.',colab:'Ajudo e escuto os colegas nos trabalhos em grupo.',auto:'Quando travo numa atividade, tento de outro jeito ou peço ajuda.',part:'Participo das discussões e mostro interesse nas aulas.',conv:'Trato todo mundo com respeito, mesmo quem pensa diferente.'};
+  const body=S.aaDone?`<div class="card stack" style="text-align:center"><div style="font-size:40px;color:var(--verde)">✓</div><h2 style="font-size:20px">Obrigado, Heitor!</h2><p class="small muted">Sua professora vai usar suas respostas na próxima devolutiva. Não existe resposta certa ou errada.</p><button class="btn sec full" onclick="go('#/aluno')">Ver minha evolução</button></div>`:
+  `<p class="small muted" style="margin-top:0">Pense no último mês. Não existe resposta certa ou errada, e isso não vale nota.</p>
+   <div class="stack">${DIMS.map(d=>`<div class="card"><div class="small muted"><b>${d.n}</b></div><div style="font-size:15px;margin-top:2px">${perg[d.id]}</div>
+    <div class="seg" role="radiogroup" aria-label="${d.n}">${ops.map((o,i)=>`<button role="radio" aria-checked="${S.aaResp[d.id]===i}" class="${S.aaResp[d.id]===i?'on':''}" onclick="S.aaResp['${d.id}']=${i};render(true)">${o}</button>`).join('')}</div></div>`).join('')}</div>
+   <label class="small" style="display:block;margin-top:14px"><b>Quer contar algo mais? (opcional)</b></label><textarea placeholder="Ex.: Em Matemática fico com vergonha de perguntar."></textarea>
+   <div id="aa-er" class="err" ${S.aaErr?'':'hidden'}>Responda as ${DIMS.length} perguntas para enviar (faltam ${DIMS.length-Object.keys(S.aaResp).length}).</div>
+   <button class="btn full" style="margin-top:12px" onclick="enviarAuto()">Enviar autoavaliação</button>`;
+  return mshell({perfil:'Estudante',head:mhead('2º bimestre · fecha 30/10','Autoavaliação'),body,tabs:ETABS,cur:'Autoavaliar'});
+}
+function enviarAuto(){if(Object.keys(S.aaResp).length<DIMS.length){S.aaErr=true;render(true);return}S.aaErr=false;S.aaDone=true;render()}
+function devolutivaCard(resp){
+  return `<div class="card stack"><div class="row between"><b>Prof.ª Marta · Matemática</b><span class="small muted">26/10</span></div>
+   <div><div class="small muted"><b>Pontos fortes</b></div>Você tem ajudado os colegas com paciência e defende quem está sendo desrespeitado.</div>
+   <div><div class="small muted"><b>O que vamos desenvolver</b></div>Pedir ajuda quando trava numa atividade, em vez de parar.</div>
+   <div class="note"><b>Meta combinada:</b> levantar a mão ao menos uma vez por aula quando tiver dúvida.</div>
+   ${resp?(S.respRead?'<span class="tag t-d">✓ Leitura confirmada em 27/10</span>':'<button class="btn sec full sm" onclick="S.respRead=true;render();toast(\'Leitura confirmada · a professora foi avisada\')">Confirmar leitura</button>'):''}</div>`;
+}
+function alunoDev(){
+  const body=`${devolutivaCard(false)}<div class="card" style="margin-top:12px"><div class="row between"><b>Prof. Rafael · Ciências</b><span class="small muted">02/09</span></div><p style="margin:6px 0 0">Sua explicação do experimento ajudou o grupo inteiro. Continue compartilhando o que descobre.</p></div>`;
+  return mshell({perfil:'Estudante',head:mhead('Conversas com seus professores','Devolutivas'),body,tabs:ETABS,cur:'Devolutivas'});
+}
+function registrosLista(base){
+  const regs=S.registros.filter(r=>r.al===HEITOR&&r.st!=='revisao');
+  return `<p class="small muted" style="margin-top:0">Registros aparecem aqui depois que o professor revisa (até 48 h). Se algo não parece certo, você pode pedir uma conversa.</p>
+   <ul class="tl">${regs.map(r=>`<li><div class="row wrap" style="gap:6px">${tag(r.t)}<b style="font-size:14.5px">${dim(r.dim).n}</b>${stTag(r.st)}</div>${r.txt?`<div style="font-size:14.5px;margin-top:4px">${esc(r.txt)}</div>`:''}<div class="meta">${r.dt} · ${r.prof}</div>
+   ${r.st==='contestado'?`<a class="small" href="${base}/conversa"><b>Ver conversa</b></a>`:r.t==='a'?`<button class="btn sec sm" style="margin-top:6px" onclick="go('${base}/conversa')">Quero conversar sobre isso</button>`:''}</li>`).join('')}</ul>`;
+}
+function alunoReg(){return mshell({perfil:'Estudante',head:mhead('Só você e sua família veem','Meus registros'),body:registrosLista('#/aluno'),tabs:ETABS,cur:'Registros'})}
+function conversa(base,perfil,tabs,cur,eu){
+  const C=S.contest;const st=C.aberta?1:2;
+  const body=`<div class="steps" aria-label="Situação da conversa"><span class="done">Aberta</span><span class="${st>=2?'done':''}">Professor respondeu</span><span>Resolvida</span></div>
+   <div class="card" style="margin-top:12px"><div class="row wrap" style="gap:6px">${tag('a')}<b>Autonomia</b><span class="small muted">21/10 · Prof.ª Marta</span></div></div>
+   <div class="stack" style="margin-top:14px">${C.msgs.map(m=>`<div class="msg ${m.me?'them':'me'}"><div class="who">${m.who}</div>${esc(m.txt)}</div>`).join('')}</div>
+   ${C.aberta?`<div class="card" style="margin-top:12px"><p class="small muted" style="margin:0">A professora tem até 31/10 para responder. Se não responder, a coordenação acompanha a conversa.</p></div>`:
+   `<textarea id="resp" style="margin-top:14px" placeholder="Responder"></textarea><div id="er" class="err" hidden>Escreva uma mensagem antes de enviar.</div><div class="row" style="margin-top:10px"><button class="btn sec" style="flex:1" onclick="toast('Conversa marcada como resolvida')">Está resolvido</button><button class="btn" style="flex:1" onclick="responderFam('${eu}')">Enviar</button></div>`}`;
+  return mshell({perfil,head:mhead('Conversa sobre um registro','Diálogo',base+'/registros'),body,tabs,cur});
+}
+function responderFam(who){const t=$('#resp'),v=t.value.trim();if(!v){$('#er').hidden=false;t.oninput=()=>$('#er').hidden=true;return}S.contest.msgs.push({who,me:false,txt:v});render();toast('Mensagem enviada')}
+
+/* ================= Responsável ================= */
+const RTABS=[['Início','#/resp','home'],['Devolutivas','#/resp/devolutivas','book'],['Registros','#/resp/registros','list'],['Privacidade','#/resp/privacidade','lock']];
+function respHome(){
+  const body=`<div class="row" role="tablist">${['Heitor','Lívia'].map(c=>`<button class="chip ${S.child===c?'on':''}" role="tab" aria-selected="${S.child===c}" onclick="S.child='${c}';render()">${c} · ${c==='Heitor'?'7º B':'4º A'}</button>`).join('')}</div>
+   ${S.child==='Heitor'?`<div class="card" style="margin-top:14px;border-color:var(--verde)"><b>A escola marcou uma conversa de acompanhamento</b><p class="small muted" style="margin:4px 0 10px">Com a coordenação e a orientadora, até 31/10. O objetivo é apoiar a rotina de estudos do Heitor.</p><button class="btn sec sm" onclick="toast('Horário confirmado: 30/10, 17h')">Confirmar horário · 30/10, 17h</button></div>
+   <div style="margin-top:12px">${radar([{nome:'Agora',v:RAD.atual,cor:'#2F9E41',fill:'rgba(47,158,65,.15)'},{nome:'1º bimestre',v:RAD.antes,cor:'#55665A',dash:1}],260)}</div>
+   <a class="card row between" href="#/resp/devolutivas" style="text-decoration:none;color:inherit;margin-top:12px"><div><b>Nova devolutiva</b><div class="small muted">Prof.ª Marta · 26/10</div></div>${S.respRead?'<span class="tag t-d">Lida</span>':'<span class="tag t-rev">Não lida</span>'}</a>
+   <a class="card row between" href="#/resp/conversa" style="text-decoration:none;color:inherit;margin-top:12px"><div><b>Sua conversa sobre o registro de 21/10</b><div class="small muted">${S.contest.aberta?'Aguardando a professora':'A professora respondeu'}</div></div><span class="tag t-ct">Abrir</span></a>`
+   :`<div class="card" style="margin-top:14px"><b>Lívia · 4º ano A</b><p class="small muted">Nenhuma novidade esta semana. A próxima devolutiva está prevista para o fim do bimestre.</p></div>`}`;
+  return mshell({perfil:'Responsável',head:mhead('Olá, Cláudia','Acompanhamento'),body,tabs:RTABS,cur:'Início'});
+}
+function respDev(){return mshell({perfil:'Responsável',head:mhead('Heitor · 7º ano B','Devolutivas'),body:devolutivaCard(true),tabs:RTABS,cur:'Devolutivas'})}
+function respReg(){return mshell({perfil:'Responsável',head:mhead('Heitor · 7º ano B','Registros'),body:registrosLista('#/resp'),tabs:RTABS,cur:'Registros'})}
+function respPriv(){
+  const body=`<div class="switch"><div><b>Tratamento dos dados de Heitor</b><div class="small muted">Consentimento dado em 03/02/2026 (LGPD, art. 14)</div></div><input type="checkbox" checked aria-label="Consentimento"></div>
+   <div class="switch"><div><b>Avisos por e-mail</b><div class="small muted">Devolutivas e conversas</div></div><input type="checkbox" checked aria-label="Avisos por e-mail"></div>
+   <div class="switch"><div><b>Avisos no celular</b><div class="small muted">Somente intervenções</div></div><input type="checkbox" aria-label="Avisos no celular"></div>
+   <button class="btn sec full" style="margin-top:16px" onclick="toast('Arquivo com os dados do Heitor enviado ao seu e-mail')">Baixar todos os dados do Heitor</button>
+   <h2 style="font-size:17px;margin:20px 0 6px">Quem acessou a ficha do Heitor</h2>
+   <table class="t"><tr><th>Quando</th><th>Quem</th></tr><tr><td class="small">27/10 08:10</td><td class="small">Coord. Paula Santos</td></tr><tr><td class="small">24/10 10:02</td><td class="small">Prof.ª Marta (Matemática)</td></tr><tr><td class="small">23/10 15:40</td><td class="small">Prof. Rafael (Ciências)</td></tr></table>
+   <p class="small muted">Dúvidas sobre privacidade: encarregado de dados da escola, dpo@escola.edu.br.</p>`;
+  return mshell({perfil:'Responsável',head:mhead('Seus dados e os do Heitor','Privacidade'),body,tabs:RTABS,cur:'Privacidade'});
+}
+
+/* ================= Roteador ================= */
+function go(h){location.hash=h}
+function route(){
+  const h=location.hash.replace(/^#/,'')||'/';const p=h.split('/').filter(Boolean);
+  const M={'':launcher,'prof':profHome,'prof/registro':profRegistro,'prof/alunos':profAlunos,'prof/autoavaliacao':profAutoaval,'prof/dialogos':profDialogos,
+   'coord':coordHome,'coord/alertas':coordAlertas,'coord/aluno':coordAluno,'coord/turma':coordTurma,'coord/clima':coordClima,'coord/intervencoes':coordInterv,'coord/config':coordConfig,
+   'aluno':alunoHome,'aluno/autoavaliacao':alunoAuto,'aluno/devolutivas':alunoDev,'aluno/registros':alunoReg,'aluno/conversa':()=>conversa('#/aluno','Estudante',ETABS,'Registros','Heitor'),
+   'resp':respHome,'resp/devolutivas':respDev,'resp/registros':respReg,'resp/privacidade':respPriv,'resp/conversa':()=>conversa('#/resp','Responsável',RTABS,'Registros','Cláudia Almeida (responsável)')};
+  if(p[0]==='prof'&&p[1]==='aluno')return profAluno(p[2]);
+  if(p[0]==='prof'&&p[1]==='devolutiva')return profDevolutiva(p[2]);
+  return (M[p.join('/')]||launcher)();
+}
+function render(keepScroll){const mb=$('#mb'),y=keepScroll&&mb?mb.scrollTop:0,wy=window.scrollY;$('#app').innerHTML=route();const nb=$('#mb');if(nb&&keepScroll)nb.scrollTop=y;if(keepScroll)window.scrollTo(0,wy)}
+window.addEventListener('hashchange',()=>{S.filtroDim=null;Object.assign(S.reg,{open:false,dim:null,sel:[],taps:0,comment:false});render();window.scrollTo(0,0)});
+render();
+</script>
+</body>
+</html>
